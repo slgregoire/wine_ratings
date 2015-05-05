@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<h1>The Wine Ratings Database</h1>
+	<p>Would you care to search the database?</p>
+	<form method='POST'>
+		{{ form.hidden_tag() }}
+		{{ form.search_terms.label }} {{ form.search_terms() }}
+		{{ form.submit() }}
+
+	{% for message in get_flashed_messages() %}
+		<p>{{ message }}</p>
+	{% endfor %}
+		
+	{% if results %}
+		<h3>Search Results</h3>
+		<ol>
+		{% for result in results[:20] %}
+			<li><a href="{{ url_for('search_bp.detail', name=result['doc']['name'], rating=result['doc']['rating'], review=result['doc']['expert_review']) }}">{{ result['doc']['name'] }}</a></li>
+		{% endfor %}
+		</ol>
+	{% endif %}
+</body>
+</html>
