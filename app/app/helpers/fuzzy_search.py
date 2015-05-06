@@ -1,31 +1,18 @@
 #fuzzy search functionality
 
 from fuzzywuzzy import fuzz
-import pymongo 
+import pandas as pd 
+import os
 
 def fuzzy_search(search):
-	#connect to db and collection
-	client = pymongo.MongoClient()
-	db = client.wine_ratings
-	collection = db.wine_enthusiast
+	#import json file with wine ratings/reviews into pandas dataframe
+	df_ratings = pd.read_json('../data/wine_ratings.json')
+	#execute fuzzy search and save results
+	df_ratings = df_ratings[:100]
+	df_ratings['score'] = df_ratings['name'].map(lambda x: fuzz.token_set_ratio(search, x))
+	df_sorted = df_ratings.sort(columns='score', ascending=False)
 
-	#query db for all documents
-	docs = collection.find()
-
-	#execute fuzzy search
-	results = []
-	scores = []
-	for doc in docs:
-		score = fuzz.token_set_ratio(search, doc['name'])
-		results_item = {
-			'score': score,
-			'doc': doc
-		}
-		results.append(results_item)
-
-	sorted_results = sorted(results, key=lambda k: k['score'], reverse=True)
-
-	return sorted_results
+	return df_sorted
 	
 
 
